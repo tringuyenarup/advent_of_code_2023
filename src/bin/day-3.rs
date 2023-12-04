@@ -53,6 +53,7 @@ impl FromStr for Scheme {
                     x += 1;
                 }
                 if let Some(symbol) = symbol {
+                    // calculate number
                     let number = row[start..x]
                         .iter()
                         .fold(0, |acc, c| acc * 10 + c.to_digit(10).unwrap());
