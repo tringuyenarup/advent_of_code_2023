@@ -95,7 +95,7 @@ mod tests {
     #[test]
     fn test_input() {
         assert_eq!(part_1(TEST_INPUT).unwrap(), 4_361);
-        // assert_eq!(part_2(TEST_INPUT).unwrap(), 467_835);
+        assert_eq!(part_2(TEST_INPUT).unwrap(), 467_835);
     }
 
     #[test]
