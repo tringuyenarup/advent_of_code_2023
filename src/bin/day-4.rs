@@ -33,21 +33,21 @@ fn part_2(input: &str) -> Result<i32> {
         .map(|game| game.parse::<Game>().unwrap())
         .collect::<Vec<Game>>();
 
-    let mut ranges = games
+    let ranges = games
         .iter()
-        .filter_map(|game| {
+        .map(|game| {
             let count = game.winning_cards.intersection(&game.your_cards).count() as i32;
             if count == 0 {
-                Some((game.id, None))
+                (game.id, None)
             } else {
-                return Some((
+                (
                     game.id,
                     Some((1..=count).map(|x| x + game.id).collect::<HashSet<i32>>()),
-                ));
+                )
             }
         })
         .collect::<Vec<(i32, Option<HashSet<i32>>)>>();
-    ranges.sort_by_key(|(k, _)| *k);
+
     Ok(ranges
         .iter()
         .fold(vec![1; ranges.len()], |mut acc: Vec<i32>, (game_id, _)| {
