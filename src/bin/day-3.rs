@@ -27,6 +27,7 @@ fn part_2(input: &str) -> Result<u32> {
         })
         .sum::<u32>())
 }
+
 #[derive(Debug)]
 struct Scheme {
     //  map contains all symbols position, type and their neighbours
@@ -62,7 +63,6 @@ impl FromStr for Scheme {
                 x += 1;
             }
         }
-
         Ok(Scheme { symbols })
     }
 }
