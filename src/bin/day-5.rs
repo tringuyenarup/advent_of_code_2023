@@ -55,41 +55,57 @@ impl Almanac {
     }
 
     fn plant_seeds_with_ranges(&mut self) -> usize {
-        // new seed ranges
+        // fix the seed ranges
         let seeds = self.relationships["seed"]
             .chunks(2)
             .map(|w| (w[0], w[0] + w[1]))
             .collect::<Vec<_>>();
-        let mapped_seeds = self.maps.iter().fold(seeds, |seeds, mappings| {
-            seeds
-                .iter()
-                .flat_map(|&(start, len)| {
-                    let mut mapped = Vec::new();
-                    let mut unmapped = vec![(start, len)];
-                    for &(dst, src, len) in mappings.2.rules.iter() {
-                        let mut m = Vec::new();
-                        for (start, end) in unmapped {
-                            let a = (start, end.min(src));
-                            let b = (start.max(src), (src + len).min(end));
-                            let c = ((src + len).max(start), end);
-                            if a.1 > a.0 {
-                                m.push(a);
+
+        // perform
+        self.maps
+            .iter()
+            .fold(seeds, |seeds, (_, _, mappings)| {
+                seeds
+                    .iter()
+                    .flat_map(|&(start, len)| {
+                        let mut mapped = Vec::new();
+                        let mut unmapped = vec![(start, len)];
+
+                        for &(dst, src, len) in mappings.rules.iter() {
+                            let mut tmp_unmapped = Vec::new();
+                            for (start, end) in unmapped {
+                                // unmapped on the right
+                                let unmapped_right = (start, end.min(src));
+                                // accepted range
+                                let accepted = (start.max(src), (src + len).min(end));
+                                // unmapped on the left
+                                let unmapped_left = ((src + len).max(start), end);
+
+                                // add range if valid
+                                // all of these cases
+                                // can happen simultaneously
+                                if accepted.1 > accepted.0 {
+                                    mapped.push((accepted.0 - src + dst, accepted.1 - src + dst));
+                                }
+                                if unmapped_right.1 > unmapped_right.0 {
+                                    tmp_unmapped.push(unmapped_right);
+                                }
+                                if unmapped_left.1 > unmapped_left.0 {
+                                    tmp_unmapped.push(unmapped_left);
+                                }
                             }
-                            if b.1 > b.0 {
-                                mapped.push((b.0 - src + dst, b.1 - src + dst));
-                            }
-                            if c.1 > c.0 {
-                                m.push(c);
-                            }
+                            unmapped = tmp_unmapped;
                         }
-                        unmapped = m;
-                    }
-                    mapped.extend(unmapped);
-                    mapped
-                })
-                .collect::<Vec<_>>()
-        });
-        mapped_seeds.iter().map(|&(s, _)| s).min().unwrap()
+                        // what didn't map remain the same in the next iteration
+                        mapped.extend(unmapped);
+                        mapped
+                    })
+                    .collect::<Vec<_>>()
+            })
+            .iter()
+            .map(|&(s, _)| s)
+            .min()
+            .unwrap()
     }
 }
 
@@ -172,6 +188,9 @@ mod tests {
 
     #[test]
     fn test_part_2() {
-        assert_eq!(part_2(include_str!("../../inputs/day-5.txt")).unwrap(), 5);
+        assert_eq!(
+            part_2(include_str!("../../inputs/day-5.txt")).unwrap(),
+            23_738_616
+        );
     }
 }
