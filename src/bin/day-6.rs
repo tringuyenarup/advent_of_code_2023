@@ -28,7 +28,7 @@ fn part_1(input: &str) -> Result<u32> {
 }
 
 fn part_2(input: &str) -> Result<u64> {
-    let (t, d) = input.split_once("\n").unwrap();
+    let (t, d) = input.split_once('\n').unwrap();
     let time = t
         .split_ascii_whitespace()
         .skip(1)
@@ -45,8 +45,8 @@ fn part_2(input: &str) -> Result<u64> {
     let delta = (time.pow(2) - (4 * distance)) as f64;
 
     // x2 < t < x1
-    let x1 = ((time as f64) * (-1 as f64) - delta.sqrt()) / ((2 * (-1)) as f64);
-    let x2 = ((time as f64) * (-1 as f64) + delta.sqrt()) / ((2 * (-1)) as f64);
+    let x1 = ((time as f64) * -1_f64 - delta.sqrt()) / (-2_f64);
+    let x2 = ((time as f64) * -1_f64 + delta.sqrt()) / (-2_f64);
 
     Ok((x1.ceil() - x2.ceil()).ceil() as u64)
 }
@@ -61,7 +61,7 @@ impl FromStr for Records {
     type Err = Box<dyn Error>;
 
     fn from_str(input: &str) -> Result<Self> {
-        let (time, distances) = input.split_once("\n").unwrap();
+        let (time, distances) = input.split_once('\n').unwrap();
         Ok(Self {
             times: time
                 .split_ascii_whitespace()
