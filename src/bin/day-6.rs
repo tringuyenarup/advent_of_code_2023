@@ -48,7 +48,7 @@ fn part_2(input: &str) -> Result<u64> {
     let x1 = ((time as f64) * -1_f64 - delta.sqrt()) / (-2_f64);
     let x2 = ((time as f64) * -1_f64 + delta.sqrt()) / (-2_f64);
 
-    Ok((x1.ceil() - x2.ceil()).ceil() as u64)
+    Ok((x1.floor() - x2.ceil()) as u64 + 1)
 }
 
 #[derive(Debug)]
