@@ -11,7 +11,6 @@ main! {
 
 fn part_1(input: &str) -> Result<usize> {
     let mut deck: Deck = Deck::new(input, false);
-
     deck.hands.sort_unstable();
 
     Ok(deck
@@ -26,8 +25,8 @@ fn part_1(input: &str) -> Result<usize> {
 
 fn part_2(input: &str) -> Result<usize> {
     let mut deck: Deck = Deck::new(input, true);
-
     deck.hands.sort_unstable();
+
     Ok(deck
         .hands
         .iter()
@@ -122,7 +121,6 @@ impl Hand {
             .filter(|&(&k, _)| *k != 'J')
             .map(|(_, v)| *v)
             .collect::<Vec<usize>>();
-        // let current_handtype = self.hand_type.clone();
 
         self.hand_type = match (*counts.iter().max().unwrap_or(&0), *num_of_jokers) {
             (a, b) if a + b == 5 => HandType::FiveOfKind,
