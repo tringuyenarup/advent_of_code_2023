@@ -16,37 +16,39 @@ fn part_1(input: &str) -> Result<i32> {
 
     let mut steps = 0;
     let mut current_node = "AAA";
-    for next_step in moves.iter().cycle() {
-        if current_node == "ZZZ" {
-            return Ok(steps);
+    loop {
+        for next_step in moves.iter().cycle() {
+            if current_node == "ZZZ" {
+                return Ok(steps);
+            }
+            steps += 1;
+            let next_move = match *next_step {
+                'L' => &network.nodes[current_node].0,
+                'R' => &network.nodes[current_node].1,
+                _ => return err!("bad move"),
+            };
+            current_node = next_move;
         }
-        steps += 1;
-        let next_move = match *next_step {
-            'L' => &network.nodes[current_node].0,
-            'R' => &network.nodes[current_node].1,
-            _ => return err!("bad move"),
-        };
-        current_node = next_move;
     }
-    err!("unreachable")
 }
 #[allow(clippy::explicit_counter_loop)]
 fn find_destination(network: &Network, moves: &[char], start: &str) -> usize {
     let mut steps = 0;
     let mut current_node = start;
-    for next_step in moves.iter().cycle() {
-        if current_node.ends_with('Z') {
-            return steps;
+    loop {
+        for next_step in moves.iter().cycle() {
+            if current_node.ends_with('Z') {
+                return steps;
+            }
+            steps += 1;
+            let next_move = match *next_step {
+                'L' => &network.nodes[current_node].0,
+                'R' => &network.nodes[current_node].1,
+                _ => panic!("Bad move"),
+            };
+            current_node = next_move;
         }
-        steps += 1;
-        let next_move = match *next_step {
-            'L' => &network.nodes[current_node].0,
-            'R' => &network.nodes[current_node].1,
-            _ => panic!("Bad move"),
-        };
-        current_node = next_move;
     }
-    unreachable!()
 }
 
 fn part_2(input: &str) -> Result<usize> {
