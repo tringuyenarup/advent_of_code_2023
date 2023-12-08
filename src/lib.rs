@@ -15,3 +15,5 @@ macro_rules! main {
 macro_rules! err {
     ($($tt:tt)*) => { Err(Box::<dyn Error>::from(format!($($tt)*))) }
 }
+
+pub mod utils;
