@@ -9,46 +9,12 @@ main! {
     (part_1(input).unwrap(),part_2(input).unwrap())
 }
 
-fn part_1(input: &str) -> Result<i32> {
+fn part_1(input: &str) -> Result<usize> {
     let (direction, network) = input.split_once("\n\n").unwrap();
     let network: Network = network.parse()?;
     let moves: Vec<char> = direction.chars().collect_vec();
 
-    let mut steps = 0;
-    let mut current_node = "AAA";
-    loop {
-        for next_step in moves.iter().cycle() {
-            if current_node == "ZZZ" {
-                return Ok(steps);
-            }
-            steps += 1;
-            let next_move = match *next_step {
-                'L' => &network.nodes[current_node].0,
-                'R' => &network.nodes[current_node].1,
-                _ => panic!("Bad move"),
-            };
-            current_node = next_move;
-        }
-    }
-}
-
-fn find_destination(network: &Network, moves: &[char], start: &str) -> usize {
-    let mut steps = 0;
-    let mut current_node = start;
-    loop {
-        for next_step in moves.iter().cycle() {
-            if current_node.ends_with('Z') {
-                return steps;
-            }
-            steps += 1;
-            let next_move = match *next_step {
-                'L' => &network.nodes[current_node].0,
-                'R' => &network.nodes[current_node].1,
-                _ => panic!("Bad move"),
-            };
-            current_node = next_move;
-        }
-    }
+    Ok(find_destination(&network, &moves, "AAA", Some("ZZZ")))
 }
 
 fn part_2(input: &str) -> Result<usize> {
@@ -64,7 +30,7 @@ fn part_2(input: &str) -> Result<usize> {
 
     let steps = current_nodes
         .iter()
-        .map(|&start| find_destination(&network, &moves, start))
+        .map(|&start| find_destination(&network, &moves, start, None))
         .collect_vec();
 
     Ok(steps.into_iter().fold(1, |mut acc, step| {
@@ -72,6 +38,31 @@ fn part_2(input: &str) -> Result<usize> {
         acc
     }))
 }
+
+fn find_destination(network: &Network, moves: &[char], start: &str, end: Option<&str>) -> usize {
+    let mut steps = 0;
+    let mut current_node = start;
+    loop {
+        for next_step in moves.iter().cycle() {
+            if let Some(end) = end {
+                if current_node == end {
+                    return steps;
+                }
+            } else if current_node.ends_with('Z') {
+                return steps;
+            }
+
+            steps += 1;
+            let next_move = match *next_step {
+                'L' => &network.nodes[current_node].0,
+                'R' => &network.nodes[current_node].1,
+                _ => panic!("Bad move"),
+            };
+            current_node = next_move;
+        }
+    }
+}
+
 #[derive(Debug)]
 struct Network {
     nodes: HashMap<String, (String, String)>,
