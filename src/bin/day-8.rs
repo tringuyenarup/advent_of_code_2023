@@ -76,8 +76,12 @@ impl FromStr for Network {
             nodes: input
                 .lines()
                 .map(|line| {
-                    let (from, to) = line.split_once(" = ").unwrap();
-                    let (left, right) = to.split_once(", ").unwrap();
+                    let (from, to) = line
+                        .split_once(" = ")
+                        .expect("ERROR: Expect input to contain \"=\" between from and to");
+                    let (left, right) = to
+                        .split_once(", ")
+                        .expect("ERROR: Expect input to contain \", \" betwee left and right");
                     (
                         String::from(from),
                         (
