@@ -57,7 +57,7 @@ fn predict_number(n: Vec<isize>, reverse: bool) -> (isize, isize) {
                 .iter()
                 .fold((0, 0), |mut acc: (isize, isize), n| {
                     acc.0 = n.first().unwrap() - acc.0;
-                    acc.1 = n.last().unwrap() + acc.1;
+                    acc.1 -= n.last().unwrap();
                     acc
                 });
         } else {
