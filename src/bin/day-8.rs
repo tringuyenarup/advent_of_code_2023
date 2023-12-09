@@ -1,4 +1,4 @@
-use aoc_2023_lib::{err, main, utils::lcm};
+use aoc_2023_lib::{main, utils::lcm};
 use itertools::Itertools;
 
 use std::{collections::HashMap, error::Error, str::FromStr};
@@ -25,7 +25,7 @@ fn part_1(input: &str) -> Result<i32> {
             let next_move = match *next_step {
                 'L' => &network.nodes[current_node].0,
                 'R' => &network.nodes[current_node].1,
-                _ => return err!("bad move"),
+                _ => panic!("Bad move"),
             };
             current_node = next_move;
         }
