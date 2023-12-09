@@ -8,7 +8,7 @@ main! {
     let input = include_str!("../../inputs/day-8.txt");
     (part_1(input).unwrap(),part_2(input).unwrap())
 }
-#[allow(clippy::explicit_counter_loop)]
+
 fn part_1(input: &str) -> Result<i32> {
     let (direction, network) = input.split_once("\n\n").unwrap();
     let network: Network = network.parse()?;
@@ -31,7 +31,7 @@ fn part_1(input: &str) -> Result<i32> {
         }
     }
 }
-#[allow(clippy::explicit_counter_loop)]
+
 fn find_destination(network: &Network, moves: &[char], start: &str) -> usize {
     let mut steps = 0;
     let mut current_node = start;
