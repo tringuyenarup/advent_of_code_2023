@@ -14,10 +14,9 @@ fn part_1(input: &str) -> Result<isize> {
         .lines()
         .map(|line| {
             let numbers = parse_line(line);
-            predict_number(numbers, true).1
+            predict_number(numbers).1
         })
-        .sum::<isize>()
-        * (-1))
+        .sum::<isize>())
 }
 
 fn part_2(input: &str) -> Result<isize> {
@@ -25,7 +24,7 @@ fn part_2(input: &str) -> Result<isize> {
         .lines()
         .map(|line| {
             let numbers = parse_line(line);
-            predict_number(numbers, true).0
+            predict_number(numbers).0
         })
         .sum::<isize>())
 }
@@ -40,7 +39,7 @@ fn parse_line(line: &str) -> Vec<isize> {
         .collect_vec()
 }
 
-fn predict_number(n: Vec<isize>, reverse: bool) -> (isize, isize) {
+fn predict_number(n: Vec<isize>) -> (isize, isize) {
     let mut numbers = n;
     let mut all_stages = Vec::new();
     all_stages.push(numbers.clone());
@@ -51,14 +50,12 @@ fn predict_number(n: Vec<isize>, reverse: bool) -> (isize, isize) {
             .map(|(a, b)| b - a)
             .collect_vec();
         if new_numbers.iter().all(|n| *n == 0) {
-            if reverse {
-                all_stages.reverse();
-            }
+            all_stages.reverse();
             return all_stages
                 .iter()
                 .fold((0, 0), |mut acc: (isize, isize), n| {
                     acc.0 = n.first().unwrap() - acc.0;
-                    acc.1 -= n.last().unwrap();
+                    acc.1 += n.last().unwrap();
                     acc
                 });
         } else {
