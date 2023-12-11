@@ -35,9 +35,7 @@ fn part_2(input: &str) -> Result<i32> {
                 let ch = maze.tiles[row][col];
                 match ch {
                     Tile::Vertical => inside = !inside,
-                    Tile::Horizontal => {}
-                    Tile::NorthEast => tile = ch,
-                    Tile::SouthEast => tile = ch,
+                    Tile::NorthEast | Tile::SouthEast => tile = ch,
                     Tile::SouthWest => {
                         if tile == Tile::NorthEast {
                             inside = !inside;
@@ -48,8 +46,7 @@ fn part_2(input: &str) -> Result<i32> {
                             inside = !inside;
                         }
                     }
-                    Tile::Ground => {}
-                    Tile::Start => {}
+                    _ => {}
                 }
             } else if inside {
                 count += 1;
