@@ -19,7 +19,6 @@ fn part_2(input: &str) -> Result<usize> {
 
 fn expand(input: &str, factor: usize) -> Result<usize> {
     let image: Image = input.parse()?;
-    // use to check the thing...
     let tranpose_grid = transpose(image.grid.clone());
 
     Ok(image

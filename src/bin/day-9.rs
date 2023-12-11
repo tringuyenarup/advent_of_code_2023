@@ -14,7 +14,7 @@ fn part_1(input: &str) -> Result<isize> {
         .lines()
         .map(|line| {
             let numbers = parse_line(line);
-            predict_number(numbers, false).1
+            predict_number(numbers, true).1
         })
         .sum::<isize>()
         * (-1))
