@@ -17,72 +17,17 @@ main! {
 
 fn part_1(input: &str) -> Result<usize> {
     let maze: Maze = input.parse()?;
-
-    let mut distances = HashMap::new();
-    let mut queue = Vec::new();
-    let mut visited = HashSet::new();
-    let mut distance = 0;
-    let start = maze.get_start_point()?;
-
-    distances.insert(start, distance);
-    visited.insert(start);
-    queue.push(
-        find_neighbours(&start.0, &start.1, &maze, &mut visited)
-            .unwrap_or_else(|| panic!("ERROR: there is no neighbours of the start")),
-    );
-
-    while let Some(next_nodes) = queue.pop() {
-        let mut next = Vec::new();
-        distance += 1;
-        for (row, col) in next_nodes {
-            let next_nodes = find_neighbours(&row, &col, &maze, &mut visited);
-            distances.insert((row, col), distance);
-
-            if let Some(next_nodes) = next_nodes {
-                next.extend(next_nodes);
-            }
-        }
-        if !next.is_empty() {
-            queue.push(next)
-        }
-    }
-
+    let visited = find_loop(&maze)?;
     Ok(visited.len() / 2)
 }
 
 fn part_2(input: &str) -> Result<i32> {
     let maze: Maze = input.parse()?;
-    let mut distances = HashMap::new();
-    let mut queue = Vec::new();
-    let mut visited = HashSet::new();
-    let mut distance = 0;
-    let start = maze.get_start_point()?;
-
-    distances.insert(start, distance);
-    visited.insert(start);
-    queue.push(
-        find_neighbours(&start.0, &start.1, &maze, &mut visited)
-            .unwrap_or_else(|| panic!("ERROR: there is no neighbours of the start")),
-    );
-
-    while let Some(next_nodes) = queue.pop() {
-        let mut next = Vec::new();
-        distance += 1;
-        for (row, col) in next_nodes {
-            let next_nodes = find_neighbours(&row, &col, &maze, &mut visited);
-            distances.insert((row, col), distance);
-
-            if let Some(next_nodes) = next_nodes {
-                next.extend(next_nodes);
-            }
-        }
-        if !next.is_empty() {
-            queue.push(next)
-        }
-    }
+    let visited = find_loop(&maze)?;
 
     let mut count = 0;
     let mut inside = false;
+
     for row in 0..maze.tiles.len() {
         let mut tile = Tile::Ground;
         for col in 0..maze.tiles[0].len() {
@@ -115,17 +60,36 @@ fn part_2(input: &str) -> Result<i32> {
     Ok(count)
 }
 
-fn _print_maze(maze: &Maze, distances: &HashMap<(i32, i32), i32>) {
-    for (y, row) in maze.tiles.iter().enumerate() {
-        for (x, _) in row.iter().enumerate() {
-            match distances.contains_key(&(y as i32, x as i32)) {
-                true => print!("{}", distances[&(y as i32, x as i32)]),
-                false => print!("."),
+fn find_loop(maze: &Maze) -> Result<HashSet<(i32, i32)>> {
+    let mut distances = HashMap::new();
+    let mut queue = Vec::new();
+    let mut visited = HashSet::new();
+    let mut distance = 0;
+    let start = maze.get_start_point()?;
+
+    distances.insert(start, distance);
+    visited.insert(start);
+    queue.push(
+        find_neighbours(&start.0, &start.1, maze, &mut visited)
+            .unwrap_or_else(|| panic!("ERROR: there is no neighbours of the start")),
+    );
+
+    while let Some(next_nodes) = queue.pop() {
+        let mut next = Vec::new();
+        distance += 1;
+        for (row, col) in next_nodes {
+            let next_nodes = find_neighbours(&row, &col, maze, &mut visited);
+            distances.insert((row, col), distance);
+
+            if let Some(next_nodes) = next_nodes {
+                next.extend(next_nodes);
             }
         }
-        println!()
+        if !next.is_empty() {
+            queue.push(next)
+        }
     }
-    println!()
+    Ok(visited)
 }
 
 fn find_neighbours(
@@ -144,29 +108,25 @@ fn find_neighbours(
         Tile::Start => Some(vec![(1, 0), (-1, 0), (0, 1), (0, -1)]),
         _ => None,
     };
-    if let Some(directions) = directions {
-        Some(
-            directions
-                .iter()
-                .filter_map(|&(dr, dc)| {
-                    let (new_row, new_col) = (row + dr, col + dc);
-                    if 0 <= new_row
-                        && new_row < maze.tiles.len() as i32
-                        && 0 <= new_col
-                        && new_col < maze.tiles[0].len() as i32
-                        && maze.tiles[new_row as usize][new_col as usize] != Tile::Ground
-                        && visited.insert((new_row, new_col))
-                    {
-                        Some((new_row, new_col))
-                    } else {
-                        None
-                    }
-                })
-                .collect_vec(),
-        )
-    } else {
-        None
-    }
+    directions.map(|directions| {
+        directions
+            .iter()
+            .filter_map(|&(dr, dc)| {
+                let (new_row, new_col) = (row + dr, col + dc);
+                if 0 <= new_row
+                    && new_row < maze.tiles.len() as i32
+                    && 0 <= new_col
+                    && new_col < maze.tiles[0].len() as i32
+                    && maze.tiles[new_row as usize][new_col as usize] != Tile::Ground
+                    && visited.insert((new_row, new_col))
+                {
+                    Some((new_row, new_col))
+                } else {
+                    None
+                }
+            })
+            .collect_vec()
+    })
 }
 
 struct Maze {
@@ -199,14 +159,6 @@ enum Tile {
     SouthEast,
     Ground,
     Start,
-}
-impl Tile {
-    fn is_ground(&self) -> bool {
-        match *self {
-            Tile::Ground => true,
-            _ => false,
-        }
-    }
 }
 
 impl Display for Maze {
@@ -267,14 +219,14 @@ mod tests {
 
     #[test]
     fn test_input() {
-        // assert_eq!(
-        //     part_1(include_str!("../../inputs/day-10-test-1.txt")).unwrap(),
-        //     8
-        // );
-        // assert_eq!(
-        //     part_1(include_str!("../../inputs/day-10-test-2.txt")).unwrap(),
-        //     4
-        // );
+        assert_eq!(
+            part_1(include_str!("../../inputs/day-10-test-1.txt")).unwrap(),
+            8
+        );
+        assert_eq!(
+            part_1(include_str!("../../inputs/day-10-test-2.txt")).unwrap(),
+            4
+        );
         assert_eq!(
             part_2(include_str!("../../inputs/day-10-test-3.txt")).unwrap(),
             4
