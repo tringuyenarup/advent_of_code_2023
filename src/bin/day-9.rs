@@ -16,7 +16,8 @@ fn part_1(input: &str) -> Result<isize> {
             let numbers = parse_line(line);
             predict_number(numbers, false).1
         })
-        .sum::<isize>())
+        .sum::<isize>()
+        * (-1))
 }
 
 fn part_2(input: &str) -> Result<isize> {
