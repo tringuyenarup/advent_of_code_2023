@@ -108,7 +108,8 @@ mod tests {
     #[test]
     fn test_input() {
         assert_eq!(part_1(TEST_INPUT).unwrap(), 374);
-        assert_eq!(part_2(TEST_INPUT).unwrap(), 1_030);
+        // in the example it is 10 and 1_000 times
+        assert_eq!(part_2(TEST_INPUT).unwrap(), 82_000_210);
     }
 
     #[test]
@@ -123,7 +124,7 @@ mod tests {
     fn test_part_2() {
         assert_eq!(
             part_2(include_str!("../../inputs/day-11.txt")).unwrap(),
-            603020563700
+            603_020_563_700
         );
     }
 }
