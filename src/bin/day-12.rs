@@ -2,7 +2,7 @@ use aoc_2023_lib::main;
 
 use std::error::Error;
 type Result<T> = std::result::Result<T, Box<dyn Error>>;
-
+// https://github.com/LinAGKar/advent-of-code-2023-rust/blob/master/day12/src/main.rs
 main! {
     let input = include_str!("../../inputs/day-12.txt");
     (part_1(input).unwrap(),part_2(input).unwrap())
