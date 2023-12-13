@@ -7,6 +7,10 @@ main! {
     let input = include_str!("../../inputs/day-13.txt");
     (part_1(input).unwrap(),part_2(input).unwrap())
 }
+// brute force everything.
+// start from row 0 -> second to last row.
+// then start from col 0 -> second to last col.
+// target is number of different tile (0 part 1 and 1 part 2)
 
 fn part_1(input: &str) -> Result<usize> {
     let grids = input
@@ -52,7 +56,7 @@ fn find_row(grid: &[&[u8]], limit: usize) -> Option<usize> {
         incorrect == limit
     })
 }
-// assume that we rather have 1 line vertically or horizontally mirror for each pattern
+
 fn solve(grids: &[Vec<&[u8]>], limit: usize) -> usize {
     grids
         .iter()
