@@ -47,15 +47,11 @@ fn arrangements(input: &str, repetitions: usize) -> usize {
             let mut pos = 0;
 
             loop {
-                let mut indent = String::new();
-                for _ in 0..stack.len() {
-                    indent.push_str("  ");
-                }
                 let len = groups[stack.len()];
                 let end = pos + len;
 
+                // There's a broken spring that's not included in a group, or we've gone past the end
                 if end > springs.len() || (pos > 0 && springs[pos - 1] == Spring::Broken) {
-                    // There's a broken spring that's not included in a group, or we've gone past the end
                     if let Some((x, y)) = stack.pop() {
                         pos = x;
                         cache[stack.len() * springs.len() + pos] = Some(count);
@@ -67,14 +63,14 @@ fn arrangements(input: &str, repetitions: usize) -> usize {
                     }
                 }
 
+                // Not a valid position
                 if (end < springs.len() && springs[end] == Spring::Broken)
                     || springs[pos..end].iter().any(|&x| x == Spring::Operational)
                 {
-                    // Not a valid position
                     pos += 1;
                     continue;
                 }
-
+                // number of remain groups = stack group
                 if stack.len() == groups.len() - 1 {
                     if springs[end..].iter().all(|&x| x != Spring::Broken) {
                         count += 1;
