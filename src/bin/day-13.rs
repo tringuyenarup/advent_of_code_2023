@@ -29,7 +29,7 @@ fn part_2(input: &str) -> Result<usize> {
 }
 fn find_col(grid: &[&[u8]], limit: usize) -> Option<usize> {
     (0..grid[0].len() - 1).find(|&c| {
-        let incorrect = (0..=c.min(grid[0].len() - c - 2))
+        let num_of_diff_tiles = (0..=c.min(grid[0].len() - c - 2))
             .map(|dc| {
                 let a = c - dc;
                 let b = c + 1 + dc;
@@ -38,13 +38,13 @@ fn find_col(grid: &[&[u8]], limit: usize) -> Option<usize> {
                     .count()
             })
             .sum::<usize>();
-        incorrect == limit
+        num_of_diff_tiles == limit
     })
 }
 
 fn find_row(grid: &[&[u8]], limit: usize) -> Option<usize> {
     (0..grid.len() - 1).find(|&r| {
-        let incorrect = (0..=r.min(grid.len() - r - 2))
+        let num_of_diff_tiles = (0..=r.min(grid.len() - r - 2))
             .map(|dr| {
                 let a = r - dr;
                 let b = r + 1 + dr;
@@ -53,7 +53,7 @@ fn find_row(grid: &[&[u8]], limit: usize) -> Option<usize> {
                     .count()
             })
             .sum::<usize>();
-        incorrect == limit
+        num_of_diff_tiles == limit
     })
 }
 
