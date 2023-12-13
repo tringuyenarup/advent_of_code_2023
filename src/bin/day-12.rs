@@ -44,10 +44,10 @@ fn arrangements(input: &str, repetitions: usize) -> usize {
                     .map(|num| num.parse::<usize>().unwrap()),
             );
 
-            springs.reserve((springs_single_rep.len() + 1 * repetitions) - 1);
+            springs.reserve((springs_single_rep.len() + repetitions) - 1);
             groups.reserve(groups_single_rep.len() * repetitions);
             for _ in 0..repetitions {
-                if springs.len() > 0 {
+                if !springs.is_empty() {
                     springs.push(Spring::Unknown);
                 }
                 springs.extend(&springs_single_rep);
@@ -63,7 +63,7 @@ fn arrangements(input: &str, repetitions: usize) -> usize {
             loop {
                 let mut indent = String::new();
                 for _ in 0..stack.len() {
-                    indent.extend("  ".chars());
+                    indent.push_str("  ");
                 }
                 let len = groups[stack.len()];
                 let end = pos + len;
@@ -73,7 +73,7 @@ fn arrangements(input: &str, repetitions: usize) -> usize {
                     if let Some((x, y)) = stack.pop() {
                         pos = x;
                         cache[stack.len() * springs.len() + pos] = Some(count);
-                        count = y + count;
+                        count += y;
                         pos += 1;
                         continue;
                     } else {
@@ -94,15 +94,13 @@ fn arrangements(input: &str, repetitions: usize) -> usize {
                         count += 1;
                     }
                     pos += 1;
+                } else if let Some(old) = cache[stack.len() * springs.len() + pos] {
+                    count += old;
+                    pos += 1;
                 } else {
-                    if let Some(old) = cache[stack.len() * springs.len() + pos] {
-                        count += old;
-                        pos += 1;
-                    } else {
-                        stack.push((pos, count));
-                        count = 0;
-                        pos = end + 1;
-                    }
+                    stack.push((pos, count));
+                    count = 0;
+                    pos = end + 1;
                 }
             }
 
