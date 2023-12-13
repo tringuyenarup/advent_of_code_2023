@@ -1,4 +1,5 @@
 use aoc_2023_lib::main;
+use itertools::Itertools;
 
 use std::error::Error;
 type Result<T> = std::result::Result<T, Box<dyn Error>>;
@@ -20,32 +21,17 @@ fn arrangements(input: &str, repetitions: usize) -> usize {
     input
         .lines()
         .map(|line| {
-            let mut springs_single_rep = Vec::new();
+            let (springs_single_rep, groups_single_rep) = parse_spring(line);
+
             let mut springs = Vec::<Spring>::new();
-            let mut groups_single_rep = Vec::new();
             let mut groups = Vec::<usize>::new();
+
             let mut stack = Vec::new();
             let mut cache = Vec::new();
 
-            let mut parts = line.split_ascii_whitespace();
-
-            springs_single_rep.extend(parts.next().unwrap().chars().map(|c| match c {
-                '#' => Spring::Broken,
-                '.' => Spring::Operational,
-                '?' => Spring::Unknown,
-                _ => panic!(),
-            }));
-
-            groups_single_rep.extend(
-                parts
-                    .next()
-                    .unwrap()
-                    .split(',')
-                    .map(|num| num.parse::<usize>().unwrap()),
-            );
-
             springs.reserve((springs_single_rep.len() + repetitions) - 1);
             groups.reserve(groups_single_rep.len() * repetitions);
+
             for _ in 0..repetitions {
                 if !springs.is_empty() {
                     springs.push(Spring::Unknown);
@@ -107,6 +93,29 @@ fn arrangements(input: &str, repetitions: usize) -> usize {
             count
         })
         .sum()
+}
+
+fn parse_spring(line: &str) -> (Vec<Spring>, Vec<usize>) {
+    let mut parts = line.split_ascii_whitespace();
+    (
+        parts
+            .next()
+            .unwrap()
+            .chars()
+            .map(|c| match c {
+                '#' => Spring::Broken,
+                '.' => Spring::Operational,
+                '?' => Spring::Unknown,
+                _ => panic!(),
+            })
+            .collect_vec(),
+        parts
+            .next()
+            .unwrap()
+            .split(',')
+            .map(|num| num.parse::<usize>().unwrap())
+            .collect_vec(),
+    )
 }
 
 #[derive(Debug, PartialEq, Clone, Copy)]
