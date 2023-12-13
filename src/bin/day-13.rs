@@ -52,7 +52,7 @@ fn find_row(grid: &[&[u8]], limit: usize) -> Option<usize> {
         incorrect == limit
     })
 }
-
+// assume that we rather have 1 line vertically or horizontally mirror for each pattern
 fn solve(grids: &[Vec<&[u8]>], limit: usize) -> usize {
     grids
         .iter()
@@ -84,6 +84,9 @@ mod tests {
 
     #[test]
     fn test_part_2() {
-        assert_eq!(part_2(include_str!("../../inputs/day-13.txt")).unwrap(), 1);
+        assert_eq!(
+            part_2(include_str!("../../inputs/day-13.txt")).unwrap(),
+            32_069
+        );
     }
 }
