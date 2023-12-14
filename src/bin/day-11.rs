@@ -19,7 +19,7 @@ fn part_2(input: &str) -> Result<usize> {
 
 fn expand(input: &str, factor: usize) -> Result<usize> {
     let image: Image = input.parse()?;
-    let tranpose_grid = transpose(image.grid.clone());
+    let tranpose_grid = transpose(&image.grid);
 
     Ok(image
         .galaxies
@@ -30,18 +30,19 @@ fn expand(input: &str, factor: usize) -> Result<usize> {
             let expand_factor = factor - 1;
             let (from_row, to_row) = (std::cmp::min(p1.0, p2.0), std::cmp::max(p1.0, p2.0));
             let (from_col, to_col) = (std::cmp::min(p1.1, p2.1), std::cmp::max(p1.1, p2.1));
+
             for row in from_row + 1..to_row {
-                if image.grid[row as usize].iter().all(|tile| tile.is_space()) {
-                    distance += expand_factor;
+                if image.grid[row as usize].iter().any(|tile| *tile != '.') {
+                    continue;
                 }
+                distance += expand_factor;
             }
+
             for col in from_col + 1..to_col {
-                if tranpose_grid[col as usize]
-                    .iter()
-                    .all(|tile| tile.is_space())
-                {
-                    distance += expand_factor;
+                if tranpose_grid[col as usize].iter().any(|tile| *tile != '.') {
+                    continue;
                 }
+                distance += expand_factor;
             }
             distance
         })
@@ -50,7 +51,7 @@ fn expand(input: &str, factor: usize) -> Result<usize> {
 
 #[derive(Clone)]
 struct Image {
-    grid: Vec<Vec<Tile>>,
+    grid: Vec<Vec<char>>,
     galaxies: HashSet<(i32, i32)>,
 }
 
@@ -66,12 +67,12 @@ impl FromStr for Image {
                 row.chars()
                     .enumerate()
                     .map(|(x, ch)| match ch {
-                        '.' => Tile::Space,
+                        '.' => ch,
                         '#' => {
                             galaxies.insert((y as i32, x as i32));
-                            Tile::Galaxy
+                            ch
                         }
-                        _ => panic!("bad input"),
+                        _ => panic!("ERROR: Bad input"),
                     })
                     .collect_vec()
             })
@@ -80,18 +81,8 @@ impl FromStr for Image {
         Ok(Self { grid, galaxies })
     }
 }
-#[derive(Clone, PartialEq)]
-enum Tile {
-    Galaxy,
-    Space,
-}
-impl Tile {
-    fn is_space(&self) -> bool {
-        *self == Tile::Space
-    }
-}
 
-fn transpose<T>(v: Vec<Vec<T>>) -> Vec<Vec<T>>
+fn transpose<T>(v: &[Vec<T>]) -> Vec<Vec<T>>
 where
     T: Clone,
 {
