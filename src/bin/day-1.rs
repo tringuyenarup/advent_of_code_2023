@@ -65,22 +65,17 @@ fn get_number(number: &str) -> u32 {
 #[cfg(test)]
 mod tests {
     use super::*;
-    const TEST_INPUT: &str = "1abc2
-pqr3stu8vwx
-a1b2c3d4e5f
-treb7uchet";
 
-    const TEST_INPUT_2: &str = "two1nine
-eightwothree
-abcone2threexyz
-xtwone3four
-4nineeightseven2
-zoneight234
-7pqrstsixteen";
     #[test]
     fn test_input() {
-        assert_eq!(part_1(TEST_INPUT).unwrap(), 142);
-        assert_eq!(part_2(TEST_INPUT_2).unwrap(), 281);
+        assert_eq!(
+            part_1(include_str!("../../inputs/day-1-test-1.txt")).unwrap(),
+            142
+        );
+        assert_eq!(
+            part_2(include_str!("../../inputs/day-1-test-2.txt")).unwrap(),
+            281
+        );
     }
 
     #[test]
