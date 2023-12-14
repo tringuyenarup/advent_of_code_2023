@@ -33,10 +33,10 @@ fn part_2(input: &str) -> Result<usize> {
         if !seen.insert(dish.grid.clone()) {
             let remained_cycles =
                 (cycles - *map.get(&dish.grid).unwrap()) % (i - *map.get(&dish.grid).unwrap());
-            for _ in 0..remained_cycles {
+            for _ in 0..remained_cycles - 1 {
                 run_a_cycle(&mut dish);
             }
-            return Ok(calculate_score(&dish.grid) - 1);
+            return Ok(calculate_score(&dish.grid));
         }
         map.insert(dish.grid.clone(), i);
     }
@@ -227,7 +227,7 @@ mod tests {
     fn test_part_2() {
         assert_eq!(
             part_2(include_str!("../../inputs/day-14.txt")).unwrap(),
-            95_274
+            95_273
         );
     }
 }
