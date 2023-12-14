@@ -24,16 +24,15 @@ fn part_1(input: &str) -> Result<usize> {
 fn part_2(input: &str) -> Result<usize> {
     let mut dish: Dish = input.parse()?;
     let cycles = 1_000_000_000;
-    let mut seen = HashSet::new();
+    let mut seen = HashSet::<Vec<Vec<Tile>>>::new();
     let mut map = HashMap::<Vec<Vec<Tile>>, usize>::new();
 
     seen.insert(dish.grid.clone());
     for i in 0..cycles {
         run_a_cycle(&mut dish);
         if !seen.insert(dish.grid.clone()) {
-            let last_seen = *map.get(&dish.grid).unwrap();
-            let duration_of_a_cycle = i - last_seen;
-            let remained_cycles = (cycles - last_seen) % duration_of_a_cycle;
+            let remained_cycles =
+                (cycles - *map.get(&dish.grid).unwrap()) % (i - *map.get(&dish.grid).unwrap());
             for _ in 0..remained_cycles {
                 run_a_cycle(&mut dish);
             }
@@ -59,7 +58,7 @@ fn move_horizontal(dish: &mut Dish, direction: i32) {
                 if dish.grid[row][col].is_rounded() {
                     let mut idx = col;
                     while idx < dish.grid[0].len() - 1 {
-                        if dish.grid[row][idx + 1] == Tile::Space {
+                        if dish.grid[row][idx + 1].is_space() {
                             idx += 1;
                         } else {
                             break;
@@ -78,7 +77,7 @@ fn move_horizontal(dish: &mut Dish, direction: i32) {
                 if dish.grid[row][col].is_rounded() {
                     let mut idx = col;
                     while idx >= 1 {
-                        if dish.grid[row][idx - 1] == Tile::Space {
+                        if dish.grid[row][idx - 1].is_space() {
                             idx -= 1;
                         } else {
                             break;
@@ -101,7 +100,7 @@ fn move_vertical(dish: &mut Dish, direction: i32) {
                 if dish.grid[row][col].is_rounded() {
                     let mut idx = row;
                     while idx >= 1 {
-                        if dish.grid[idx - 1][col] == Tile::Space {
+                        if dish.grid[idx - 1][col].is_space() {
                             idx -= 1;
                         } else {
                             break;
@@ -120,7 +119,7 @@ fn move_vertical(dish: &mut Dish, direction: i32) {
                 if dish.grid[row][col].is_rounded() {
                     let mut idx = row;
                     while idx < dish.grid.len() - 1 {
-                        if dish.grid[idx + 1][col] == Tile::Space {
+                        if dish.grid[idx + 1][col].is_space() {
                             idx += 1;
                         } else {
                             break;
@@ -193,6 +192,9 @@ impl FromStr for Dish {
 impl Tile {
     fn is_rounded(&self) -> bool {
         *self == Tile::Rounded
+    }
+    fn is_space(&self) -> bool {
+        *self == Tile::Space
     }
 }
 
