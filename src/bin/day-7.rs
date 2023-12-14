@@ -108,7 +108,7 @@ impl Hand {
             'Q' => 12,
             'K' => 13,
             'A' => 14,
-            _ => panic!("bad card"),
+            _ => panic!("ERROR: Bad card"),
         }
     }
 
@@ -131,12 +131,12 @@ impl Hand {
                 match (pairs, *num_of_jokers) {
                     (2, 1) => HandType::FullHouse,
                     (1, 1) => HandType::ThreeOfKind,
-                    _ => panic!("this case should not appear here"),
+                    _ => panic!("ERROR: This case should not appear here"),
                 }
             }
             (1, 2) => HandType::ThreeOfKind,
             (1, 1) => HandType::OnePair,
-            _ => panic!("this case should not appear here"),
+            _ => panic!("ERROR: This case should not appear here"),
         };
     }
 }
@@ -213,7 +213,7 @@ impl FromStr for Hand {
             }
             4 => HandType::OnePair,
             5 => HandType::HighCard,
-            _ => return err!("bad hand type"),
+            _ => return err!("ERROR: Bad hand type"),
         };
         Ok(Self {
             cards,

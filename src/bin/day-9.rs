@@ -34,7 +34,7 @@ fn parse_line(line: &str) -> Vec<isize> {
         .map(|number| {
             number
                 .parse::<isize>()
-                .unwrap_or_else(|_| panic!("bad input {number}"))
+                .unwrap_or_else(|_| panic!("ERROR: Bad input {number}"))
         })
         .collect_vec()
 }

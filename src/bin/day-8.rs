@@ -56,7 +56,7 @@ fn find_destination(network: &Network, moves: &[char], start: &str, end: Option<
             let next_move = match *next_step {
                 'L' => &network.nodes[current_node].0,
                 'R' => &network.nodes[current_node].1,
-                _ => panic!("Bad move"),
+                _ => panic!("ERROR: Bad move"),
             };
             current_node = next_move;
         }

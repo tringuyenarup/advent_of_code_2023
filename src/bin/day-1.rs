@@ -59,7 +59,7 @@ fn get_number(number: &str) -> u32 {
         "seven" | "7" => 7,
         "eight" | "8" => 8,
         "nine" | "9" => 9,
-        _ => panic!("bad input"),
+        _ => panic!("ERROR: Bad input"),
     }
 }
 #[cfg(test)]
