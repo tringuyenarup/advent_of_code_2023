@@ -13,42 +13,38 @@ fn part_1(input: &str) -> Result<i32> {
 }
 
 fn part_2(input: &str) -> Result<usize> {
-    let boxes = input.split(',').fold(
-        vec![VecDeque::default(); 256],
-        |mut acc: Vec<VecDeque<(&str, u8)>>, len| {
-            let (label, focal_length) = match len.contains('=') {
-                true => {
-                    let (a, b) = len.split_once('=').unwrap();
-                    (a, b.parse::<u8>().unwrap())
-                }
-                false => (len.trim_end_matches('-'), 0),
-            };
-            let box_index = hash(label);
+    Ok(input
+        .split(',')
+        .fold(
+            vec![VecDeque::default(); 256],
+            |mut acc: Vec<VecDeque<(&str, u8)>>, len| {
+                let (label, focal_length) = match len.contains('=') {
+                    true => {
+                        let (a, b) = len.split_once('=').unwrap();
+                        (a, b.parse::<u8>().unwrap())
+                    }
+                    false => (len.trim_end_matches('-'), 0),
+                };
+                let box_index = hash(label);
 
-            if focal_length == 0 {
-                if let Some(pos) = acc[box_index as usize]
+                if focal_length == 0 {
+                    if let Some(pos) = acc[box_index as usize]
+                        .iter()
+                        .position(|&(l, _)| l == label)
+                    {
+                        acc[box_index as usize].remove(pos);
+                    }
+                } else if let Some(pos) = acc[box_index as usize]
                     .iter()
                     .position(|&(l, _)| l == label)
                 {
-                    acc[box_index as usize].remove(pos);
+                    acc[box_index as usize][pos] = (label, focal_length);
+                } else {
+                    acc[box_index as usize].push_back((label, focal_length));
                 }
-            } else if let Some(pos) = acc[box_index as usize]
-                .iter()
-                .position(|&(l, _)| l == label)
-            {
-                acc[box_index as usize][pos] = (label, focal_length);
-            } else {
-                acc[box_index as usize].push_back((label, focal_length));
-            }
-            acc
-        },
-    );
-
-    Ok(calc_score(&boxes))
-}
-
-fn calc_score(boxes: &[VecDeque<(&str, u8)>]) -> usize {
-    boxes
+                acc
+            },
+        )
         .iter()
         .enumerate()
         .filter_map(|(index, b)| {
@@ -64,17 +60,7 @@ fn calc_score(boxes: &[VecDeque<(&str, u8)>]) -> usize {
                 None
             }
         })
-        .sum::<usize>()
-}
-
-fn _print_boxes(boxes: &[VecDeque<(&str, u8)>]) {
-    for b in boxes.iter().enumerate().filter(|&b| !b.1.is_empty()) {
-        print!("Box {} ", b.0);
-        for &(name, value) in b.1.iter() {
-            print!(" [{name} {value}],");
-        }
-        println!();
-    }
+        .sum::<usize>())
 }
 
 fn hash(data: &str) -> i32 {
