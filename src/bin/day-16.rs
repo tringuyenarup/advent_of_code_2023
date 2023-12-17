@@ -3,6 +3,7 @@ use aoc_2023_lib::main;
 use std::error::Error;
 type Result<T> = std::result::Result<T, Box<dyn Error>>;
 
+// optimized by this solution
 //https://github.com/LinAGKar/advent-of-code-2023-rust/blob/master/day16/src/main.rs
 main! {
     let input = include_str!("../../inputs/day-16.txt");
@@ -46,7 +47,7 @@ fn reset(map: &mut [Vec<(Tile, u8)>]) {
 
 fn energized_count(map: &mut Vec<Vec<(Tile, u8)>>, start: (BeamDir, usize, usize)) -> u16 {
     let mut beams = vec![start];
-    let mut new_directions = Vec::with_capacity(2);
+    let mut new_directions = Vec::new();
     let mut energized = 0;
 
     while let Some((direction, x, y)) = beams.pop() {
