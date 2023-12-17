@@ -10,13 +10,11 @@ main! {
 
 fn part_1(input: &str) -> Result<u16> {
     let mut contraption = input.parse::<Contraption>()?;
-
     Ok(contraption.count_energy((BeamDir::Right, 0, 0)))
 }
 
 fn part_2(input: &str) -> Result<u16> {
     let mut contraption = input.parse::<Contraption>()?;
-
     let height = contraption.grid.len();
     let width = contraption.grid[0].len();
 
@@ -120,23 +118,6 @@ impl Contraption {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
-enum BeamDir {
-    Right = 0b0001,
-    Down = 0b0010,
-    Left = 0b0100,
-    Up = 0b1000,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
-enum Tile {
-    MirrorUR,
-    MirrorUL,
-    SplitterVert,
-    SplitterHoriz,
-    Space,
-}
-
 impl FromStr for Contraption {
     type Err = Box<dyn Error>;
 
@@ -164,6 +145,23 @@ impl FromStr for Contraption {
                 .collect(),
         })
     }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+enum BeamDir {
+    Right = 0b0001,
+    Down = 0b0010,
+    Left = 0b0100,
+    Up = 0b1000,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+enum Tile {
+    MirrorUR,
+    MirrorUL,
+    SplitterVert,
+    SplitterHoriz,
+    Space,
 }
 
 #[cfg(test)]
