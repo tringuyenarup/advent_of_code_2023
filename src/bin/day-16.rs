@@ -3,6 +3,7 @@ use aoc_2023_lib::main;
 use std::error::Error;
 type Result<T> = std::result::Result<T, Box<dyn Error>>;
 
+//https://github.com/LinAGKar/advent-of-code-2023-rust/blob/master/day16/src/main.rs
 main! {
     let input = include_str!("../../inputs/day-16.txt");
     (part_1(input).unwrap(),part_2(input).unwrap())
@@ -15,9 +16,9 @@ fn part_1(input: &str) -> Result<u16> {
 
 fn part_2(input: &str) -> Result<u16> {
     let mut map = parse_map(input);
+
     let height = map.len();
     let width = map[0].len();
-
     // Enter from every outer edge
     Ok((0..height)
         .flat_map(|y| [(BeamDir::Right, 0, y), (BeamDir::Left, width - 1, y)].into_iter())
@@ -26,17 +27,21 @@ fn part_2(input: &str) -> Result<u16> {
                 .flat_map(|x| [(BeamDir::Down, x, 0), (BeamDir::Up, x, height - 1)].into_iter()),
         )
         .map(|start| {
-            // Clean up from previous run
-            for line in &mut map {
-                for (_, directions) in line {
-                    *directions = 0;
-                }
-            }
-
+            // reset the map
+            reset(&mut map);
+            // count again for it
             energized_count(&mut map, start)
         })
         .max()
         .unwrap())
+}
+
+fn reset(map: &mut [Vec<(Tile, u8)>]) {
+    for line in map {
+        for (_, directions) in line {
+            *directions = 0;
+        }
+    }
 }
 
 fn energized_count(map: &mut Vec<Vec<(Tile, u8)>>, start: (BeamDir, usize, usize)) -> u16 {
@@ -56,6 +61,7 @@ fn energized_count(map: &mut Vec<Vec<(Tile, u8)>>, start: (BeamDir, usize, usize
             // No light has entered this tile before
             energized += 1;
         }
+        // update the state for the cell
         *directions |= direction as u8;
 
         // Calculate directions of light exiting this tile
