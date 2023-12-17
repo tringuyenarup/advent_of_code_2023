@@ -65,7 +65,7 @@ impl Contraption {
 
             *is_visited |= current_direction as u8;
 
-            let new_beams_directions = find_new_directions(tile, &current_direction);
+            let new_beams_directions = Self::find_new_directions(tile, &current_direction);
             for &new_direction in &new_beams_directions {
                 let (new_row, new_col) = match new_direction {
                     BeamDir::Right => (row, col + 1),
@@ -82,42 +82,42 @@ impl Contraption {
         }
         counter
     }
-}
 
-fn find_new_directions(tile: &Tile, current_direction: &BeamDir) -> Vec<BeamDir> {
-    let mut new_beams_directions = Vec::new();
-    match *tile {
-        Tile::Space => new_beams_directions.push(*current_direction),
-        Tile::MirrorUR => new_beams_directions.push(match current_direction {
-            BeamDir::Right => BeamDir::Down,
-            BeamDir::Down => BeamDir::Right,
-            BeamDir::Left => BeamDir::Up,
-            BeamDir::Up => BeamDir::Left,
-        }),
+    fn find_new_directions(tile: &Tile, current_direction: &BeamDir) -> Vec<BeamDir> {
+        let mut new_beams_directions = Vec::new();
+        match *tile {
+            Tile::Space => new_beams_directions.push(*current_direction),
+            Tile::MirrorUR => new_beams_directions.push(match current_direction {
+                BeamDir::Right => BeamDir::Down,
+                BeamDir::Down => BeamDir::Right,
+                BeamDir::Left => BeamDir::Up,
+                BeamDir::Up => BeamDir::Left,
+            }),
 
-        Tile::MirrorUL => new_beams_directions.push(match current_direction {
-            BeamDir::Right => BeamDir::Up,
-            BeamDir::Down => BeamDir::Left,
-            BeamDir::Left => BeamDir::Down,
-            BeamDir::Up => BeamDir::Right,
-        }),
-        Tile::SplitterVert => {
-            if *current_direction as u8 & 0b1010 != 0 {
-                new_beams_directions.push(*current_direction);
-            } else {
-                new_beams_directions.extend(&[BeamDir::Up, BeamDir::Down]);
+            Tile::MirrorUL => new_beams_directions.push(match current_direction {
+                BeamDir::Right => BeamDir::Up,
+                BeamDir::Down => BeamDir::Left,
+                BeamDir::Left => BeamDir::Down,
+                BeamDir::Up => BeamDir::Right,
+            }),
+            Tile::SplitterVert => {
+                if *current_direction as u8 & 0b1010 != 0 {
+                    new_beams_directions.push(*current_direction);
+                } else {
+                    new_beams_directions.extend(&[BeamDir::Up, BeamDir::Down]);
+                }
             }
-        }
 
-        Tile::SplitterHoriz => {
-            if *current_direction as u8 & 0b0101 != 0 {
-                new_beams_directions.push(*current_direction);
-            } else {
-                new_beams_directions.extend(&[BeamDir::Left, BeamDir::Right]);
+            Tile::SplitterHoriz => {
+                if *current_direction as u8 & 0b0101 != 0 {
+                    new_beams_directions.push(*current_direction);
+                } else {
+                    new_beams_directions.extend(&[BeamDir::Left, BeamDir::Right]);
+                }
             }
-        }
-    };
-    new_beams_directions
+        };
+        new_beams_directions
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
@@ -173,7 +173,7 @@ mod tests {
     #[test]
     fn test_input() {
         assert_eq!(part_1(TEST_INPUT).unwrap(), 46);
-        // assert_eq!(part_2(TEST_INPUT).unwrap(), 51);
+        assert_eq!(part_2(TEST_INPUT).unwrap(), 51);
     }
 
     #[test]
