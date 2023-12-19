@@ -55,7 +55,7 @@ fn part_1(input: &str) -> Result<i32> {
     }
     Ok(ans)
 }
-
+//https://github.com/AxlLind/AdventOfCode2023/blob/main/src/bin/19.rs
 fn part_2(input: &str) -> Result<usize> {
     let (workflows, _) = input.split_once("\n\n").unwrap();
     let workflows = workflows
@@ -103,6 +103,7 @@ fn count_accepted<'a>(
     }
     let mut ans = 0;
     let workflow = &workflows[curr];
+
     for &(p, op, n, label) in &workflow.0 {
         let i = "xmas".chars().position(|c| c == p).unwrap();
         let (r, tmp) = ranges[i]
