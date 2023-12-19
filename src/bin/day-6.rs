@@ -4,7 +4,7 @@ use std::{error::Error, str::FromStr};
 type Result<T> = std::result::Result<T, Box<dyn Error>>;
 
 main! {
-    let input = include_str!("../../inputs/day-1.txt");
+    let input = include_str!("../../inputs/day-6.txt");
     (part_1(input).unwrap(),part_2(input).unwrap())
 }
 
