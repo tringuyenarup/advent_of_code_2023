@@ -1,124 +1,119 @@
 use aoc_2023_lib::main;
 use itertools::Itertools;
 
-use std::error::Error;
+use std::{collections::HashMap, error::Error, str::FromStr};
 type Result<T> = std::result::Result<T, Box<dyn Error>>;
-// https://github.com/LinAGKar/advent-of-code-2023-rust/blob/master/day12/src/main.rs
+
 main! {
     let input = include_str!("../../inputs/day-12.txt");
     (part_1(input).unwrap(),part_2(input).unwrap())
 }
 
 fn part_1(input: &str) -> Result<usize> {
-    Ok(arrangements(input, 1))
+    Ok(input
+        .lines()
+        .map(|line| {
+            let mut spring = line.parse::<Spring>().unwrap();
+            spring.score(0)
+        })
+        .sum())
 }
 
 fn part_2(input: &str) -> Result<usize> {
-    Ok(arrangements(input, 5))
-}
-
-fn arrangements(input: &str, repetitions: usize) -> usize {
-    input
+    Ok(input
         .lines()
         .map(|line| {
-            let (springs_single_rep, groups_single_rep) = parse_spring(line);
-
-            let mut springs = Vec::<Spring>::new();
-            let mut groups = Vec::<usize>::new();
-
-            let mut stack = Vec::new();
-            let mut cache = Vec::new();
-
-            springs.reserve((springs_single_rep.len() + repetitions) - 1);
-            groups.reserve(groups_single_rep.len() * repetitions);
-
-            for _ in 0..repetitions {
-                if !springs.is_empty() {
-                    springs.push(Spring::Unknown);
-                }
-                springs.extend(&springs_single_rep);
-                groups.extend(&groups_single_rep);
-            }
-
-            cache.resize((groups.len() - 1) * springs.len(), None);
-            stack.reserve(groups.len() - 1);
-
-            let mut count = 0;
-            let mut pos = 0;
-
-            loop {
-                let len = groups[stack.len()];
-                let end = pos + len;
-
-                // There's a broken spring that's not included in a group, or we've gone past the end
-                if end > springs.len() || (pos > 0 && springs[pos - 1] == Spring::Broken) {
-                    if let Some((x, y)) = stack.pop() {
-                        pos = x;
-                        cache[stack.len() * springs.len() + pos] = Some(count);
-                        count += y;
-                        pos += 1;
-                        continue;
-                    } else {
-                        break;
-                    }
-                }
-
-                // Not a valid position
-                if (end < springs.len() && springs[end] == Spring::Broken)
-                    || springs[pos..end].iter().any(|&x| x == Spring::Operational)
-                {
-                    pos += 1;
-                    continue;
-                }
-                // number of remain groups = stack group
-                if stack.len() == groups.len() - 1 {
-                    if springs[end..].iter().all(|&x| x != Spring::Broken) {
-                        count += 1;
-                    }
-                    pos += 1;
-                } else if let Some(old) = cache[stack.len() * springs.len() + pos] {
-                    count += old;
-                    pos += 1;
-                } else {
-                    stack.push((pos, count));
-                    count = 0;
-                    pos = end + 1;
-                }
-            }
-
-            count
+            let mut spring = line.parse::<Spring>().unwrap();
+            spring.score(5)
         })
-        .sum()
+        .sum())
 }
 
-fn parse_spring(line: &str) -> (Vec<Spring>, Vec<usize>) {
-    let mut parts = line.split_ascii_whitespace();
-    (
-        parts
-            .next()
-            .unwrap()
-            .chars()
-            .map(|c| match c {
-                '#' => Spring::Broken,
-                '.' => Spring::Operational,
-                '?' => Spring::Unknown,
-                _ => panic!(),
-            })
-            .collect_vec(),
-        parts
-            .next()
-            .unwrap()
+struct Spring {
+    pattern: Vec<char>,
+    sizes: Vec<usize>,
+}
+
+impl Spring {
+    fn score(&mut self, scale_factor: usize) -> usize {
+        let mut cache = HashMap::new();
+        if scale_factor != 0 {
+            self.scale(scale_factor);
+        }
+        Self::arrange(&self.pattern, &self.sizes, &mut cache)
+    }
+
+    fn arrange(
+        pattern: &[char],
+        sizes: &[usize],
+        cache: &mut HashMap<(usize, usize), usize>,
+    ) -> usize {
+        if let Some(arrangements) = cache.get(&(pattern.len(), sizes.len())) {
+            return *arrangements;
+        }
+        if sizes.is_empty() {
+            return (!pattern.contains(&'#')) as usize;
+        }
+
+        let min_remaining = sizes.iter().sum::<usize>() + sizes.len() - 1;
+
+        if pattern.len() < min_remaining {
+            return 0;
+        }
+
+        let result = match pattern[0] {
+            '.' => Self::arrange(&pattern[1..], sizes, cache),
+            '#' => Self::hash(pattern, sizes, cache),
+            '?' => Self::arrange(&pattern[1..], sizes, cache) + Self::hash(pattern, sizes, cache),
+            _ => panic!("ERROR: bad input"),
+        };
+        cache.insert((pattern.len(), sizes.len()), result);
+        result
+    }
+    fn hash(
+        pattern: &[char],
+        sizes: &[usize],
+        cache: &mut HashMap<(usize, usize), usize>,
+    ) -> usize {
+        if pattern.len() < sizes[0] || pattern[0..sizes[0]].contains(&'.') {
+            return 0;
+        }
+        if pattern.len() == sizes[0] {
+            return (sizes.len() == 1) as usize;
+        }
+        if pattern[sizes[0]] == '#' {
+            return 0;
+        }
+
+        Self::arrange(&pattern[sizes[0] + 1..], &sizes[1..], cache)
+    }
+    fn scale(&mut self, scale_factor: usize) {
+        let mut pattern: Vec<char> = Vec::new();
+        for _ in 0..scale_factor - 1 {
+            pattern.extend(self.pattern.iter().chain([&'?']));
+        }
+        let mut sizes: Vec<usize> = Vec::new();
+        pattern.extend(self.pattern.iter());
+        for _ in 0..scale_factor {
+            sizes.extend(self.sizes.iter());
+        }
+        self.pattern = pattern;
+        self.sizes = sizes;
+    }
+}
+
+impl FromStr for Spring {
+    type Err = Box<dyn Error>;
+
+    fn from_str(s: &str) -> Result<Self> {
+        let (pattern, nums) = s.split_once(' ').unwrap();
+        let pattern = pattern.chars().collect_vec();
+        let sizes = nums
             .split(',')
-            .map(|num| num.parse::<usize>().unwrap())
-            .collect_vec(),
-    )
-}
-
-#[derive(Debug, PartialEq, Clone, Copy)]
-enum Spring {
-    Unknown,
-    Broken,
-    Operational,
+            .map(|n| n.parse::<usize>().unwrap())
+            .collect_vec();
+        Ok(Self { pattern, sizes })
+    }
 }
 
 #[cfg(test)]
