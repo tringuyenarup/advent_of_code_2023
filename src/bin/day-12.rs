@@ -63,14 +63,17 @@ impl Spring {
 
         let result = match pattern[0] {
             '.' => Self::arrange(&pattern[1..], sizes, cache),
-            '#' => Self::hash(pattern, sizes, cache),
-            '?' => Self::arrange(&pattern[1..], sizes, cache) + Self::hash(pattern, sizes, cache),
+            '#' => Self::arrange_hash(pattern, sizes, cache),
+            '?' => {
+                Self::arrange(&pattern[1..], sizes, cache)
+                    + Self::arrange_hash(pattern, sizes, cache)
+            }
             _ => panic!("ERROR: bad input"),
         };
         cache.insert((pattern.len(), sizes.len()), result);
         result
     }
-    fn hash(
+    fn arrange_hash(
         pattern: &[char],
         sizes: &[usize],
         cache: &mut HashMap<(usize, usize), usize>,
