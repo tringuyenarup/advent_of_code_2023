@@ -72,7 +72,8 @@ impl Configuration {
         let mut queue =
             VecDeque::from([(String::from("button"), String::from("broadcaster"), false)]);
         let mut count = [0; 2];
-        let mut cycle = 0;
+        // index of module in the predecessor which will give high input in this simulation
+        let mut index = 0;
         while let Some((sender, receiver, pulse)) = queue.pop_front() {
             if receiver == "rx" && !pulse {
                 return (0, 0);
@@ -99,7 +100,7 @@ impl Configuration {
                             if let Some(predecessor) =
                                 predecessors.iter().position(|p| *p == receiver)
                             {
-                                cycle = predecessor + 1;
+                                index = predecessor + 1;
                             }
                         }
 
@@ -115,8 +116,8 @@ impl Configuration {
                 }
             }
         }
-        if cycle != 0 {
-            (0, cycle - 1)
+        if index != 0 {
+            (0, index - 1)
         } else {
             (count[0], count[1])
         }
