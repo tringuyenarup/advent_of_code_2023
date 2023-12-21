@@ -1,12 +1,8 @@
 use aoc_2023_lib::main;
 use itertools::Itertools;
+use pathfinding::matrix::Matrix;
 
-use std::{
-    collections::{HashMap, HashSet},
-    error::Error,
-    fmt::Display,
-    str::FromStr,
-};
+use std::{collections::HashSet, error::Error, str::FromStr};
 type Result<T> = std::result::Result<T, Box<dyn Error>>;
 
 main! {
@@ -21,75 +17,42 @@ fn part_1(input: &str) -> Result<usize> {
 }
 
 fn part_2(input: &str) -> Result<usize> {
-    let garden = input.parse::<Map>()?;
-
-    Ok(garden.step_repeat(50))
-}
-struct Map {
-    start: (usize, usize),
-    tiles: Vec<Vec<Tile>>,
+    Ok(part(input, 26_501_365))
 }
 
-impl Display for Map {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        for row in self.tiles.iter() {
-            for cell in row.iter() {
-                match *cell {
-                    Tile::Garden => write!(f, ".")?,
-                    Tile::Rock => write!(f, "#")?,
-                }
-            }
-            writeln!(f,)?
+fn part(input: &str, goal: usize) -> usize {
+    let grid = Matrix::from_rows(input.lines().map(str::bytes)).unwrap();
+    let (sr, sc) = grid
+        .items()
+        .find_map(|(pos, b)| (*b == b'S').then_some(pos))
+        .unwrap();
+    let (g, mut ys, mut reachable) = (grid.rows, vec![], HashSet::new());
+    reachable.insert((sr as isize, sc as isize));
+    for count in 1..=goal {
+        for (r, c) in reachable.drain().collect::<Vec<_>>() {
+            reachable.extend(
+                [(r + 1, c), (r - 1, c), (r, c + 1), (r, c - 1)]
+                    .iter()
+                    .filter(|&&(nr, nc)| grid[grid.constrain((nr, nc))] != b'#'),
+            );
         }
-
-        Ok(())
+        if count % g == g / 2 {
+            ys.push(reachable.len());
+            if let &[y0, y1, y2] = &ys[..] {
+                let x = goal / g;
+                return (x * x * (y0 + y2 - 2 * y1) + x * (4 * y1 - 3 * y0 - y2) + 2 * y0) / 2;
+            }
+        }
     }
+    reachable.len()
+}
+
+struct Map {
+    start: (i32, i32),
+    gardens: HashSet<(i32, i32)>,
 }
 
 impl Map {
-    fn step_repeat(&self, steps: isize) -> usize {
-        let mut queue = Vec::new();
-        queue.push(self.start);
-        let mut counter = 0;
-        let mut all_points = HashMap::new();
-        while counter < steps {
-            let mut new_queue: HashMap<(usize, usize), usize> = HashMap::new();
-            while let Some(pos) = queue.pop() {
-                let new_pos = vec![
-                    ((pos.0 + 1) % self.tiles.len(), pos.1),
-                    ((pos.0 + self.tiles.len() - 1) % self.tiles.len(), pos.1),
-                    (pos.0, (pos.1 + 1) % self.tiles[0].len()),
-                    (
-                        pos.0,
-                        (pos.1 + self.tiles[0].len() - 1) % self.tiles[0].len(),
-                    ),
-                ]
-                .iter()
-                .filter_map(|&pos| {
-                    if self.tiles[pos.0][pos.1].is_garden() {
-                        Some(pos)
-                    } else {
-                        None
-                    }
-                })
-                .fold(HashMap::new(), |mut acc, p| {
-                    *acc.entry(p).or_insert(0) += 1;
-                    acc
-                });
-                for (k, v) in new_pos.clone() {
-                    *new_queue.entry(k).or_default() += v;
-                }
-            }
-            for (k, v) in new_queue.clone() {
-                *all_points.entry(k).or_insert(1) *= v;
-            }
-            queue = new_queue.keys().map(|k| k.clone()).collect();
-
-            counter += 1;
-        }
-        all_points.values().sum()
-    }
-
     fn step(&self, steps: isize) -> usize {
         let mut queue = Vec::new();
         queue.push(self.start);
@@ -100,20 +63,16 @@ impl Map {
             while let Some(pos) = queue.pop() {
                 let new_pos = [
                     (pos.0 + 1, pos.1),
-                    (pos.0.wrapping_sub(1), pos.1),
+                    (pos.0 - 1, pos.1),
                     (pos.0, pos.1 + 1),
-                    (pos.0, pos.1.wrapping_sub(1)),
+                    (pos.0, pos.1 - 1),
                 ]
                 .iter()
                 .filter_map(|(new_r, new_c)| {
-                    if *new_r > self.tiles.len() - 1 || *new_c > self.tiles[0].len() - 1 {
-                        None
+                    if self.gardens.contains(&(*new_r, *new_c)) {
+                        Some((*new_r, *new_c))
                     } else {
-                        if self.tiles[*new_r][*new_c].is_garden() {
-                            Some((*new_r, *new_c))
-                        } else {
-                            None
-                        }
+                        None
                     }
                 })
                 .collect_vec();
@@ -131,35 +90,25 @@ impl FromStr for Map {
 
     fn from_str(input: &str) -> Result<Self> {
         let mut start = (0, 0);
-        let tiles = input
+
+        let gardens = input
             .lines()
             .enumerate()
-            .map(|(row, line)| {
+            .flat_map(|(row, line)| {
                 line.chars()
                     .enumerate()
-                    .map(|(col, c)| match c {
-                        '#' => Tile::Rock,
-                        '.' => Tile::Garden,
+                    .filter_map(|(col, c)| match c {
+                        '.' => Some((row as i32, col as i32)),
                         'S' => {
-                            start = (row, col);
-                            Tile::Garden
+                            start = (row as i32, col as i32);
+                            Some((row as i32, col as i32))
                         }
-                        _ => panic!("ERROR: BAD INPUT"),
+                        _ => None,
                     })
                     .collect_vec()
             })
-            .collect_vec();
-        Ok(Self { start, tiles })
-    }
-}
-#[derive(PartialEq, Clone)]
-enum Tile {
-    Garden,
-    Rock,
-}
-impl Tile {
-    fn is_garden(&self) -> bool {
-        *self == Tile::Garden
+            .collect::<HashSet<(i32, i32)>>();
+        Ok(Self { start, gardens })
     }
 }
 
@@ -183,6 +132,9 @@ mod tests {
 
     #[test]
     fn test_part_2() {
-        assert_eq!(part_2(include_str!("../../inputs/day-21.txt")).unwrap(), 1);
+        assert_eq!(
+            part_2(include_str!("../../inputs/day-21.txt")).unwrap(),
+            584_211_423_220_706
+        );
     }
 }
