@@ -50,28 +50,24 @@ impl Coord {
     }
 
     fn infinite_neighbours(&self) -> Vec<Self> {
-        let mut res = Vec::new();
-        // up
-        res.push(Coord {
-            col: self.col,
-            row: self.row - 1,
-        });
-        // down
-        res.push(Coord {
-            col: self.col,
-            row: self.row + 1,
-        });
-        // left
-        res.push(Coord {
-            col: self.col - 1,
-            row: self.row,
-        });
-        // right
-        res.push(Coord {
-            col: self.col + 1,
-            row: self.row,
-        });
-        res
+        vec![
+            Coord {
+                col: self.col,
+                row: self.row - 1,
+            },
+            Coord {
+                col: self.col,
+                row: self.row + 1,
+            },
+            Coord {
+                col: self.col - 1,
+                row: self.row,
+            },
+            Coord {
+                col: self.col + 1,
+                row: self.row,
+            },
+        ]
     }
 }
 
