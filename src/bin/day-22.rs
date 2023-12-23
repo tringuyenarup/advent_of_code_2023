@@ -38,13 +38,13 @@ fn part_1(input: &str) -> Result<usize> {
             }
         }
     }
-    let mut p1 = 0;
+    let mut ans = 0;
     for b in 0..bricks.len() {
         let mut falling = HashSet::new();
         if_disintegrated(&mut falling, &above, &below, b);
-        p1 += if falling.len() == 1 { 1 } else { 0 };
+        ans += if falling.len() == 1 { 1 } else { 0 };
     }
-    Ok(p1)
+    Ok(ans)
 }
 
 fn part_2(input: &str) -> Result<usize> {
@@ -59,13 +59,13 @@ fn part_2(input: &str) -> Result<usize> {
             }
         }
     }
-    let mut p2 = 0;
+    let mut ans = 0;
     for b in 0..bricks.len() {
         let mut falling = HashSet::new();
         if_disintegrated(&mut falling, &above, &below, b);
-        p2 += falling.len() - 1;
+        ans += falling.len() - 1;
     }
-    Ok(p2)
+    Ok(ans)
 }
 
 fn parse(input: &str) -> Vec<(usize, usize, usize, usize, usize, usize, usize)> {
