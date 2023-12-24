@@ -43,15 +43,13 @@ fn part_1(input: &str) -> Result<i32> {
         .tuple_combinations()
         .filter_map(|(d1, d2)| {
             if d1.0 == d2.0 {
-                return None;
+                None
             } else {
                 let x = (d2.1 - d1.1) / (d1.0 - d2.0);
                 let y = -(d2.0 * d1.1 - d2.1 * d1.0) / (d1.0 - d2.0);
 
-                if 200_000_000_000_000f64 <= x
-                    && x <= 400_000_000_000_000f64
-                    && 200_000_000_000_000f64 <= y
-                    && y <= 400_000_000_000_000f64
+                if (200_000_000_000_000f64..=400_000_000_000_000f64).contains(&x)
+                    && (200_000_000_000_000f64..=400_000_000_000_000f64).contains(&y)
                 {
                     if (d1.3 < 0f64 && x > d1.2)
                         || (d1.3 > 0f64 && x < d1.2)
@@ -60,7 +58,7 @@ fn part_1(input: &str) -> Result<i32> {
                     {
                         return None;
                     }
-                    return Some(1);
+                    Some(1)
                 } else {
                     None
                 }
