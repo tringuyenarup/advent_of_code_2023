@@ -16,4 +16,3 @@ pathfinding = "4.7.0"
 regex = "1.10.2"
 z3 = { version = "0.12.1", features = ["static-link-z3"] }
 z3-sys = "0.8.1"
-# z3 = { version = "0.12", features = ["static-link-z3"] }

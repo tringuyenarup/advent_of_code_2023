@@ -112,11 +112,6 @@ fn part_2(input: &str) -> Result<i64> {
 mod tests {
     use super::*;
     const TEST_INPUT: &str = include_str!("../../inputs/day-24-test.txt");
-    // #[test]
-    // fn test_input() {
-    //     // assert_eq!(part_1(TEST_INPUT).unwrap(), 2); // this one will fail because it ranges are different
-    //     // assert_eq!(part_2(TEST_INPUT).unwrap(), 47);
-    // }
 
     #[test]
     fn test_part_1() {
