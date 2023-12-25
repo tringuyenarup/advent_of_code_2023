@@ -2,3 +2,5 @@
 target/
 .vscode/
 inputs
+out.dot 
+out.svg
