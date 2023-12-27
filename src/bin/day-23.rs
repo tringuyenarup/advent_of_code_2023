@@ -19,7 +19,6 @@ fn part_1(input: &str) -> Result<usize> {
     dfs(&grid, &mut seen, (0, 1), 0, &mut ans);
 
     Ok(ans)
-
     // Ok(bdf(&grid))
 }
 
@@ -29,6 +28,7 @@ fn part_2(input: &str) -> Result<usize> {
     let mut seen = HashSet::new();
     let mut ans = 0;
     dfs_branches(&grid, &edges, (0, 1), &mut seen, 0, &mut ans);
+
     Ok(ans)
     // Ok(bfs_branches(&grid))
 }
@@ -59,14 +59,14 @@ fn dfs_branches(
 
 fn bfs_branches(grid: &[&[u8]]) -> usize {
     let edges = find_branching_edges(grid);
-    let mut ends = Vec::new();
+    let mut max = usize::MIN;
     let visited = HashSet::new();
     let mut queue = VecDeque::new();
 
     queue.push_back(((0, 1), visited.clone(), 0));
     while let Some((pos, mut visited, cost)) = queue.pop_front() {
         if pos.0 == grid.len() - 1 {
-            ends.push(cost);
+            max = max.max(cost);
             continue;
         }
         if !visited.insert(pos) {
@@ -82,7 +82,7 @@ fn bfs_branches(grid: &[&[u8]]) -> usize {
         }
     }
 
-    *ends.iter().max().unwrap()
+    max
 }
 
 fn find_neighbours(grid: &[&[u8]], pos: &(usize, usize)) -> Vec<(usize, usize)> {
@@ -182,7 +182,7 @@ fn dfs(
 }
 
 fn bdf(grid: &[&[u8]]) -> usize {
-    let mut ends = Vec::<usize>::new();
+    let mut max = usize::MIN;
     let mut queue = VecDeque::new();
     let seen = HashSet::new();
 
@@ -190,7 +190,7 @@ fn bdf(grid: &[&[u8]]) -> usize {
 
     while let Some((pos, mut seen, cost)) = queue.pop_front() {
         if pos.0 == grid.len() - 1 {
-            ends.push(cost);
+            max = max.max(cost);
             continue;
         }
 
@@ -220,7 +220,7 @@ fn bdf(grid: &[&[u8]]) -> usize {
         }
     }
 
-    ends.into_iter().max().unwrap()
+    max
 }
 
 #[cfg(test)]

@@ -15,31 +15,29 @@ fn part_1(input: &str) -> Result<usize> {
     let grid = parse(input);
     let start = Point::new(0, 0);
     let end = Point::new(grid.len() - 1, grid[0].len() - 1);
-    Ok(dijkstra(&grid, &start, &end, 1, 3, get_neighbours))
+    Ok(dijkstra(&grid, &start, &end, get_neighbours::<1, 3>))
 }
 
 fn part_2(input: &str) -> Result<usize> {
     let grid = parse(input);
     let start = Point::new(0, 0);
     let end = Point::new(grid.len() - 1, grid[0].len() - 1);
-    Ok(dijkstra(&grid, &start, &end, 4, 10, get_neighbours))
+    Ok(dijkstra(&grid, &start, &end, get_neighbours::<4, 10>))
 }
-fn get_neighbours(
+fn get_neighbours<const MIN: usize, const MAX: usize>(
     node: &Node,
     grid: &[Vec<usize>],
-    min_steps: usize,
-    max_steps: usize,
 ) -> Vec<Node> {
     let mut neighbors = Vec::new();
     for (d, p) in node.position.valid_next(grid) {
         if d == node.direction.opposite() {
             // We can't go in the opposite direction.
             continue;
-        } else if d != node.direction && node.direction_count >= min_steps {
+        } else if d != node.direction && node.direction_count >= MIN {
             // We can only change direction if we've already gone in
             // this direction 4 times or more.
             neighbors.push(Node::new(d, p, 1));
-        } else if d == node.direction && node.direction_count < max_steps {
+        } else if d == node.direction && node.direction_count < MAX {
             // We can only go in the same direction if we haven't gone
             // more than 10 times in this durection..
             neighbors.push(Node::new(d, p, node.direction_count + 1));
@@ -61,16 +59,9 @@ fn parse(input: &str) -> Vec<Vec<usize>> {
         .collect::<Vec<_>>()
 }
 
-fn dijkstra<F>(
-    grid: &[Vec<usize>],
-    start: &Point,
-    end: &Point,
-    min_steps: usize,
-    max_steps: usize,
-    neighbor_fn: F,
-) -> usize
+fn dijkstra<F>(grid: &[Vec<usize>], start: &Point, end: &Point, neighbor_fn: F) -> usize
 where
-    F: Fn(&Node, &[Vec<usize>], usize, usize) -> Vec<Node>,
+    F: Fn(&Node, &[Vec<usize>]) -> Vec<Node>,
 {
     // Track our min distances at each Node. In our specific case, we
     // have multiple because we could be coming from South or East
@@ -99,7 +90,7 @@ where
         }
 
         // Otherwise, check our neighbors.
-        for neighbor in neighbor_fn(&node, grid, min_steps, max_steps) {
+        for neighbor in neighbor_fn(&node, grid) {
             // If we've already visited this node and it was cheaper,
             // we don't need to keep checking this way.
             let new_cost = cost + grid[neighbor.position.y][neighbor.position.x];
