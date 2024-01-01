@@ -13,6 +13,8 @@ aho-corasick = "1.1.2"
 itertools = "0.12.0"
 once_cell = "1.18.0"
 pathfinding = "4.7.0"
+priority-queue = "1.3.2"
 regex = "1.10.2"
+rustworkx-core = "0.13.2"
 z3 = { version = "0.12.1", features = ["static-link-z3"] }
 z3-sys = "0.8.1"
