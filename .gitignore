@@ -4,3 +4,4 @@ target/
 inputs
 out.dot 
 out.svg
+.z3-trace
