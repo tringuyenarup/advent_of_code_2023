@@ -16,11 +16,15 @@ fn part_1(input: &str) -> Result<u32> {
                 .chars()
                 .filter(|c| c.is_ascii_digit())
                 .collect::<Vec<_>>();
-            if results.len() == 1 {
-                results[0].to_digit(10).unwrap() * 11
-            } else {
-                results[0].to_digit(10).unwrap() * 10
-                    + results.last().unwrap().to_digit(10).unwrap()
+            match results.len() == 1 {
+                true => calculate_number(
+                    results.first().unwrap().to_digit(10).unwrap(),
+                    results.first().unwrap().to_digit(10).unwrap(),
+                ),
+                false => calculate_number(
+                    results.first().unwrap().to_digit(10).unwrap(),
+                    results.last().unwrap().to_digit(10).unwrap(),
+                ),
             }
         })
         .sum::<u32>())
@@ -42,10 +46,16 @@ fn part_2(input: &str) -> Result<u32> {
                 .find_overlapping_iter(line)
                 .map(|mat| mat.pattern())
                 .collect::<Vec<_>>();
-            get_number(patterns[results.first().unwrap().as_usize()]) * 10
-                + get_number(patterns[results.last().unwrap().as_usize()])
+            calculate_number(
+                get_number(patterns[results.first().unwrap().as_usize()]),
+                get_number(patterns[results.last().unwrap().as_usize()]),
+            )
         })
         .sum::<u32>())
+}
+
+fn calculate_number(first_digit: u32, second_digit: u32) -> u32 {
+    first_digit * 10 + second_digit
 }
 
 fn get_number(number: &str) -> u32 {

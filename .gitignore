@@ -1,7 +1,7 @@
 .DS_store
 target/
 .vscode/
-inputs
+# inputs
 out.dot 
 out.svg
 .z3-trace
