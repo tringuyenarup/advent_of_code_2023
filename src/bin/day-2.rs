@@ -107,7 +107,7 @@ mod tests {
         );
         assert_eq!(
             part_2(include_str!("../../inputs/day-2-test.txt")).unwrap(),
-            2286
+            2_286
         );
     }
 
