@@ -9,7 +9,7 @@ main! {
 }
 
 fn part_1(input: &str) -> Result<u32> {
-    let records: Records = input.parse()?;
+    let records: Records = input.parse().expect("parse records");
 
     Ok(records
         .times

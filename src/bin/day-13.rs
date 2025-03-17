@@ -1,6 +1,6 @@
 use aoc_2023_lib::main;
 
-use std::{error::Error, usize};
+use std::error::Error;
 type Result<T> = std::result::Result<T, Box<dyn Error>>;
 
 main! {
